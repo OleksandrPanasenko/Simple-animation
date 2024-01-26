@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .background{
+            background-color: aliceblue;
+            width:300px;
+            height: 300px;
+            margin: 0px;
+            position:relative;
+
+        }
+        .ball{
+            background-color: red;
+            border-radius: 100%;
+            /*border: 5px solid black;*/
+            height: 100px;
+            position: fixed;
+        }
+        .begin{
+            background-color: green;
+            padding: 10px;
+            border: 1px solid yellow;
+            cursor: pointer;
+        }
+        .begin:hover{
+            background-color: red;
+            color: white;
+            border: 1px solid purple;
+        }
+    </style>
+</head>
+<body>
+    <button class="begin">Begin</button>
+    
+    <div class="background">
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+    </div>
+    <script>
+        const size=200;
+        document.querySelectorAll(".background").forEach((element)=>{
+            element.style.height=`${size}px`;
+            element.style.width=`${size}px`;
+        });
+        const interval=1;
+        const divisions=40;
+        const radius=15;
+        let ball=document.querySelectorAll(".ball");
+        ball.forEach((element)=>element.style.height=`${radius*2}px`);
+        ball.forEach((element)=>element.style.width=`${radius*2}px`);
+        positionToMargin=({x,y})=>{
+            const height=size;
+            const width=size;
+            const xCentre= height/2;
+            const yCentre=width/2;
+            
+
+
+            let out={};
+            out.upper=(yCentre-(y+radius));
+            out.right=(width-xCentre-(x+radius))
+            out.down=(height-yCentre-(y+radius));
+            out.left=(xCentre-(x+radius));
+            return out;
+            
+        }
+        getLocation=(angle)=> {return({x: Math.cos(angle)*(size/2-radius), y: Math.sin(angle)*(size/2-radius)})};
+        console.log(getLocation(0));
+        console.log(positionToMargin(getLocation(0)));
+        let currentLocation=0;
+        setCircleLocation=(angle)=>{
+            
+            ball.forEach((element, index)=>{
+                const pos=positionToMargin(getLocation(angle+index*2*Math.PI/ball.length));
+                element.style["margin-top"]=`${pos.upper}px`;
+                element.style["margin-bottom"]=`${pos.down}px`;
+                element.style["margin-left"]=`${pos.left}px`;
+                element.style["margin-right"]=`${pos.right}px`;
+            });
+        }
+        //console.log(getLocation(0));
+        //ball.style["margin-top"]=`${100}px`;
+        let rolling=false;
+        let rollingID;
+        document.querySelector(".begin").addEventListener("click",()=>{
+            if(!rolling){
+            rollingID=setInterval(()=>{
+            let angle=currentLocation/divisions*2*Math.PI;
+            setCircleLocation(angle);
+            (++currentLocation)%divisions;
+            
+            },interval/divisions);
+            document.querySelector(".begin").innerHTML="Stop";
+            rolling=true;
+            }
+            else{
+                rolling=false;
+                clearInterval(rollingID);
+                document.querySelector(".begin").innerHTML="Resume";
+            }
+
+        });
+        console.log("hello world!");
+    </script>
+</body>
+</html>
